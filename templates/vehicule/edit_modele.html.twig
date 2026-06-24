@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+{% block title %}Modifier un modèle{% endblock %}
+{% block body %}
+<h1>Modifier le modèle</h1>
+<div class="form-wrapper">
+    {{ form_start(form) }}
+        {{ form_row(form.modele_vehic) }}
+        {{ form_row(form.marque) }}
+        {{ form_row(form.annee) }}
+        {{ form_row(form.date_achat) }}
+        <div style="display:flex; gap:1rem;">
+            <button type="submit">Enregistrer</button>
+            <a href="{{ path('app_vehicules') }}" style="padding:0.5rem 1.4rem; background:#ccc; border:none; border-radius:4px; cursor:pointer; text-decoration:none; color:black;">Annuler</a>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

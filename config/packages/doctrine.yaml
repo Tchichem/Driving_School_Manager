@@ -1,0 +1,53 @@
+doctrine:
+    dbal:
+        driver: pdo_sqlsrv
+        # MODIFIER LES INFORMATIONS DE CONNEXION A LA BDD
+        # HEBERGEMENT AVEC NOM DE L'INSTANCE
+        host: localhost\\NOM_INSTANCE
+        # NOM DE LA BDD
+        dbname: NOM_BASE
+        # NOM DE L'UTILISATEUR
+        user: "NOM_USER"
+        # MOT DE PASSE DE L'UTILISATEUR
+        password: "PASSWORD"
+        charset: UTF-8
+        options:
+            TrustServerCertificate: 1
+        profiling_collect_backtrace: '%kernel.debug%'
+    orm:
+        validate_xml_mapping: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        identity_generation_preferences:
+            Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
+        auto_mapping: true
+        mappings:
+            App:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App
+
+when@test:
+    doctrine:
+        dbal:
+            # "TEST_TOKEN" is typically set by ParaTest
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        orm:
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

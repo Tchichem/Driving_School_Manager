@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+{% block title %}Utilisateurs{% endblock %}
+{% block body %}
+
+<h1>Gestion des utilisateurs</h1>
+
+{% for message in app.flashes('success') %}
+    <div style="background:#efe; border:1px solid #cfc; padding:0.8rem; border-radius:4px; margin-bottom:1rem; color:#060;">{{ message }}</div>
+{% endfor %}
+{% for message in app.flashes('error') %}
+    <div style="background:#fee; border:1px solid #fcc; padding:0.8rem; border-radius:4px; margin-bottom:1rem; color:#900;">{{ message }}</div>
+{% endfor %}
+
+<h2>Ajouter un utilisateur</h2>
+<div class="form-wrapper">
+    <form method="post" action="{{ path('app_users') }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('create_user') }}">
+        <div>
+            <label>Email</label>
+            <input type="email" name="email" required>
+        </div>
+        <div>
+            <label>Mot de passe</label>
+            <input type="password" name="password" required minlength="8">
+        </div>
+        <div>
+            <label>Rôle</label>
+            <select name="role">
+                <option value="ROLE_USER">Utilisateur</option>
+                <option value="ROLE_ADMIN">Admin</option>
+            </select>
+        </div>
+        <button type="submit">Créer</button>
+    </form>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ 'ROLE_ADMIN' in user.roles ? 'Admin' : 'Utilisateur' }}</td>
+            <td>
+                <a href="{{ path('app_users_edit', {'id': user.id}) }}"><button class="btn-update" type="submit">Modifier</button></a>
+                {% if user != app.user %}
+                <form method="post" action="{{ path('app_users_delete', {'id': user.id}) }}" style="display:inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ user.id) }}">
+                    <button class="btn-delete" type="submit" onclick="return confirm('Supprimer cet utilisateur ?')">Supprimer</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

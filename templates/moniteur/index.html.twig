@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Moniteurs{% endblock %}
+
+{% block body %}
+
+<h1>Moniteurs</h1>
+
+<h2>Enregistrer un nouveau moniteur</h2>
+<div class="form-wrapper">
+    {{ form_start(form) }}
+        {{ form_row(form.nom_moniteur) }}
+        {{ form_row(form.prenom_moniteur) }}
+        {{ form_row(form.date_naissance_moniteur) }}
+        {{ form_row(form.date_embauche) }}
+        {{ form_row(form.activite) }}
+        <button type="submit">Enregistrer</button>
+    {{ form_end(form) }}
+</div>
+
+<form id="searchbar" method="get" action="{{ path('app_moniteurs') }}">
+    Rechercher : <input type="text" name="search" value="{{ app.request.query.get('search') }}">
+    <button type="submit">Entrer</button>
+</form>
+
+{% if moniteurs.getTotalItemCount() > 0 %}
+    <div id="table-container">
+        <table>
+            {% set nextDir = direction == 'asc' ? 'desc' : 'asc' %}
+            <thead>
+                <tr>
+                    <th><a href="{{ path('app_moniteurs', {tri: 'id_moniteur', sens: nextDir, search: search}) }}">ID {{ sort == 'id_moniteur' ? (direction == 'asc' ? '↑' : '↓') : '↕' }}</a></th>
+                    <th><a href="{{ path('app_moniteurs', {tri: 'nom_moniteur', sens: nextDir, search: search}) }}">Nom {{ sort == 'nom_moniteur' ? (direction == 'asc' ? '↑' : '↓') : '↕' }}</a></th>
+                    <th><a href="{{ path('app_moniteurs', {tri: 'prenom_moniteur', sens: nextDir, search: search}) }}">Prénom {{ sort == 'prenom_moniteur' ? (direction == 'asc' ? '↑' : '↓') : '↕' }}</a></th>
+                    <th><a href="{{ path('app_moniteurs', {tri: 'date_naissance_moniteur', sens: nextDir, search: search}) }}">Date de naissance {{ sort == 'date_naissance_moniteur' ? (direction == 'asc' ? '↑' : '↓') : '↕' }}</a></th>
+                    <th><a href="{{ path('app_moniteurs', {tri: 'date_embauche', sens: nextDir, search: search}) }}">Date d'embauche {{ sort == 'date_embauche' ? (direction == 'asc' ? '↑' : '↓') : '↕' }}</a></th>
+                    <th>Activité</th>
+                    {% if is_granted('ROLE_ADMIN') %}<th>Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for moniteur in moniteurs %}
+                <tr>
+                    <td>{{ moniteur.idMoniteur }}</td>
+                    <td>{{ moniteur.nomMoniteur }}</td>
+                    <td>{{ moniteur.prenomMoniteur }}</td>
+                    <td>{{ moniteur.dateNaissanceMoniteur|date('d/m/Y') }}</td>
+                    <td>{{ moniteur.dateEmbauche|date('d/m/Y') }}</td>
+                    <td>
+                        <form method="post" action="{{ path('app_moniteurs_update', {'id': moniteur.idMoniteur}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('update_moniteur') }}">
+                            <input type="hidden" name="valeur" value="{{ moniteur.activite ? '0' : '1' }}">
+                            <button type="submit">{{ moniteur.activite ? 'Disponible' : 'En congés' }}</button>
+                        </form>
+                    </td>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <td>
+                            <a href="{{ path('app_moniteurs_edit', {'id': moniteur.idMoniteur}) }}"><button class="btn-update" type="submit">Modifier</button></a>
+                            <form method="post" action="{{ path('app_moniteurs_delete', {'id': moniteur.idMoniteur}) }}" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_moniteur_' ~ moniteur.idMoniteur) }}">
+                                <button class="btn-delete" type="submit" onclick="return confirm('Supprimer ce moniteur ?')">Supprimer</button>
+                            </form>
+                        </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {{ knp_pagination_render(moniteurs) }}
+{% else %}
+    <p>Aucun moniteur n'est actuellement inscrit.</p>
+{% endif %}
+
+{% endblock %}
