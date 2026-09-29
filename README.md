@@ -121,4 +121,4 @@ L'application est accessible sur `https://localhost:8000`.
 
 ## Auteur
 
-Hichem — Formation Concepteur Développeur d'Applications (CDA) — AFPA Nice 2026
+Hichem, Concepteur Développeur d'Applications — 2026
